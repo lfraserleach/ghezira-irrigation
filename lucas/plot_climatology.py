@@ -18,7 +18,7 @@ path_to_savefig = 'C:/Users/prate/Desktop/Climate Impacts Hackathon/figures/'
 #### FUNCTIONS ####
 def plot(obs, mod, title, unit):
     print(f'plotting {title} obs...')
-    plt.figure(figsize=(10,5))
+    plt.figure(figsize=(6,4))
     clim = obs.groupby('time.dayofyear').mean(dim='time')
     max=obs.groupby('time.dayofyear').max(dim='time')
     min=obs.groupby('time.dayofyear').min(dim='time')
@@ -39,7 +39,7 @@ def plot(obs, mod, title, unit):
     plt.legend()
     plt.xlabel('Days since January 1st')
     plt.ylabel(f'{title} ({unit})')
-    plt.title(f'Mean Regional {title} Climatology {start}-{end-1} ({unit})')
+    plt.title(f'Mean Gezira Scheme Climatology {start}-{end-1} ({unit})')
     plt.savefig(path_to_savefig+f'{title} Climatology.jpg',dpi=300)
 
 
@@ -68,7 +68,7 @@ tmax=tmax.mean(dim=('lat','lon'))
 tmin= mask_region(f_tmin.t2m)
 tmin=tmin.mean(dim=('lat','lon'))
 
-temp_obs = (tmax + tmin) / 2  + 273.15
+temp_obs = (tmax + tmin) / 2 
 
 print('loading cesm...')
 f_precip = xr.open_dataset(path_to_mod+f"precip.cesm.daily.historical.{start}-{end-1}.nc")
@@ -86,7 +86,7 @@ rhumid_mod=rhumid_mod.mean(dim=('lat','lon'))
 print('meaned humidity...')
 
 temp_mod=mask_region_cesm(f_temp.tas)
-temp_mod=temp_mod.mean(dim=('lat','lon'))
+temp_mod=temp_mod.mean(dim=('lat','lon'))-273.15
 print('meaned temp...')
 
 revap_obs=reference_crop_evapotranspiration(temp_obs,rhumid_obs)
@@ -96,6 +96,6 @@ revap_mod=reference_crop_evapotranspiration(temp_mod,rhumid_mod)
 print('plotting...')
 plot(precip_obs, precip_mod, 'Daily Precipitation', 'mm/day')
 plot(rhumid_obs, rhumid_mod, 'Relative Humidity', '%')
-plot(temp_obs, temp_mod, 'Surface Air Temperature', 'K')
+plot(temp_obs, temp_mod, 'Surface Air Temperature', 'C')
 plot(revap_obs, revap_mod,'Reference Evapotransporation', 'mm/day')
 plt.show()

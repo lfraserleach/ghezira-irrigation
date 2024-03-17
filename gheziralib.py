@@ -69,7 +69,8 @@ KC[COTTON][monx[8]:monx[9]]=0.60
 # KC[COTTON]=[np.nan,np.nan,0.35,0.63,0.91,1.20,1.20,1.00,0.80,0.60,np.nan,np.nan]
 
 def reference_crop_evapotranspiration(temp, rh):
-    return 16 * temp / rh
+    return 16 * temp / rh 
+#rh.isel(time=slice(0,timen))
     
 def crop_water_demand(crop, temp, rh):
     """

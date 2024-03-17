@@ -12,24 +12,29 @@ from gheziralib import *
 
 #### PATHS ###
 path_to_downscaled = 'C:/Users/prate/Desktop/Climate Impacts Hackathon/data/cesm/'
-
+path_to_obs = 'C:/Users/prate/Desktop/Climate Impacts Hackathon/data/era5_Geriza_HighRes/'
 # SETTINGS
 forcing = 'his' # or '370'
 bias_correction='dbcca' # or 'bcca'
 efficiency=0.55
 
-f_precip = xr.open_dataset(path_to_downscaled+f"precip.cesm.daily.historical.1980-2010.nc")
-f_rhumid = xr.open_dataset(path_to_downscaled+f"RH.cesm.daily.historical.1980-2010.nc")
-f_temp = xr.open_dataset(path_to_downscaled+f"tas.cesm.daily.historical.1980-2010.nc")
+f_precip = xr.open_dataset(path_to_obs+f"precip.e5.daily.highres.1980-2010.nc")
+#f_rhumid = xr.open_dataset(path_to_downscaled+f"RH.cesm.daily.historical.1980-2010.nc")
+f_rhumid= xr.open_dataset(path_to_obs+f"RH.e5.daily.highres.1980-2010.nc")
+f_tmax = xr.open_dataset(path_to_obs+f"tmax.e5.daily.highres.1980-2010.nc")
+f_min = xr.open_dataset(path_to_obs+f"tmin.e5.daily.highres.1980-2010.nc")
                          
-precip_mod=mask_region_cesm(f_precip.pr) * 3600 * 24
+precip_mod=mask_region(f_precip.tp)
+precip_mod=precip_mod.convert_calendar("noleap")
 
-rhumid_mod=mask_region_cesm(f_rhumid.hur) * 100
+rhumid_mod=mask_region(f_rhumid.relative_humidity) #* 100
+rhumid_mod=rhumid_mod.convert_calendar("noleap")
 
-temp_mod=mask_region_cesm(f_temp.tas)
+temp_mod=(mask_region(f_tmax.t2m)+mask_region(f_tmax.t2m))/2 + 273.15
+temp_mod=temp_mod.convert_calendar("noleap")
 
 revap_mod=reference_crop_evapotranspiration(temp_mod,rhumid_mod)
-
+print(rhumid_mod.shape)
 CROPS = [WHEAT, SORGHUM, GROUNDNUTS, COTTON]
 LANDUSE = [0.39, 0.37, 0.15, 0.09]
 area = 750000 * 10000 # convert ha to m^2
